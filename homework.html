@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>我是誰</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@100;300;400;500;700;900&display=swap"
+    rel="stylesheet">
+  <style>
+    *,
+    body{
+      height: 100%;
+    }
+
+    body{
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      background: url(./images/布幕.png)no-repeat center/cover;
+      background-color: rgb(66, 5, 5);
+      position: relative;
+    }
+
+    #game {
+      width: 80vw;
+      height: 70vh;
+      /* border: 1px solid black; */
+      overflow: hidden;
+      cursor: url(./images/af320-b4cak-002.ico)50 50, auto;
+      position: fixed;
+      bottom: 5%;
+      left: 10%;
+    }
+
+    #game img {
+      height: 150px;
+      position: absolute;
+    }
+
+    .pika,
+    .pika2,
+    .pika3 {
+      z-index: 1000;
+    }
+
+    p {
+      color: white;
+    }
+
+    #btn-start {
+      width: 10%;
+      height: 10%;
+      background-color: rgb(248, 140, 17);
+      border: 1px solid rgb(117, 3, 3);
+      font-size: 2rem;
+      color: brown;
+      border-radius: 25%;
+      cursor: pointer;
+      z-index: 1;
+    }
+
+    #who {
+      width: 100%;
+      height: 10vh;
+      position: absolute;
+      top: 0;
+    }
+
+    .wHo {
+      width: 25%;
+      height: 100%;
+      position: absolute;
+      left: 0;
+      top: -10%;
+      transform: rotate(335deg);
+      text-align: center;
+      font-size: 3rem;
+      font-family: 'Noto Sans TC', sans-serif;
+      color: #ffb20b;
+    }
+
+    .fraction {
+      height: 25%;
+      position: absolute;
+      right: 10%;
+    }
+
+    #footer {
+      width: 100%;
+      height: 3%;
+      text-align: center;
+      line-height: 2px;
+      position: fixed;
+      bottom: 0%;
+    }
+
+    .before {
+      margin: 0;
+      background: rgba(0, 0, 123, 0.4);
+      width: 100%;
+      height: 100%;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .btn{
+      display: flex;
+      align-self: center;
+      height: 30%;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="before">
+    <input type="button" value="開始遊戲" id="btn-start">
+  </div>
+  <div id="who">
+    <div class="wHo">
+      <h1>我是誰❓</h1>
+    </div>
+    <br>
+    <div class="fraction">
+      <p>目前分數: <span id="score">0</span>分</p>
+      <p>剩餘: <span id="time">0</span>秒</p>
+      <p>寶可夢大師:<span id="highname">???</span></p>
+      <p>最高分:<span id="highscore"></span></p>
+    </div>
+  </div>
+  <div id="game"></div>
+  <div id="footer">
+    <p>圖片版權歸The Pokémon Company所有</p>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="./jquery-3.6.0.min.js"></script>
+  <script>
+    let score = 0
+    let cd = 30
+    let timer = 0
+
+    const audio = new Audio()
+    const au = new Audio()
+
+
+    var high = { score: 0, name: '???' }
+    const storage = JSON.parse(localStorage.getItem('pokemon'))
+    console.log(storage)
+    if (storage == null) {
+      localStorage.setItem('pokemon',
+        JSON.stringify({
+          'score': 0,
+          'name': "??"
+        })
+      )
+    }
+    if (storage) {
+      high.name = storage.name
+      high.score = storage.score
+      $('#highname').text(high.name)
+      $('#highscore').text(high.score)
+    }
+
+
+    const move = (pika) => {
+      const top = `${Math.round(Math.random() * 80)}%`
+      const left = `${Math.round(Math.random() * 90)}%`
+      pika.stop().animate({
+        top,
+        left
+      }, 2000, function () {
+        move(pika)
+      })
+    }
+    const mo = (pika2) => {
+      const top = `${Math.round(Math.random() * 80)}%`
+      const left = `${Math.round(Math.random() * 90)}%`
+      pika2.stop().animate({
+        top,
+        left
+      }, 2000, function () {
+        mo(pika2)
+      })
+    }
+    const ve = (pika3) => {
+      const top = `${Math.round(Math.random() * 80)}%`
+      const left = `${Math.round(Math.random() * 90)}%`
+      pika3.stop().animate({
+        top,
+        left
+      }, 2000, function () {
+        ve(pika3)
+      })
+    }
+
+
+    $('#btn-start').click(function () {
+      $('.before').css("display", "none")
+      $(this).attr('disabled', true)
+      audio.src = './皮卡丘之歌之皮卡四重奏.mp3'
+      audio.play()
+      score = 0
+      $('#score').text(score)
+      cd = 30
+      $('#time').text(cd)
+      timer = setInterval(function () {
+        cd--
+        $('#time').text(cd)
+
+        let random = Math.round(Math.random() * 10)
+        if (random > 5 && $("#game").length < 5) {
+          const top = `${Math.round(Math.random() * 70)}%`
+          const left = `${Math.round(Math.random() * 70)}%`
+          const pika = $(`<img class="pika" src ="./images/1-black.png" style="top:${top}; left:${left}">`)
+          $("#game").append(pika)
+          move(pika)
+        }
+        if (random > 5 && $("#game").length < 5) {
+          const top = `${Math.round(Math.random() * 70)}%`
+          const left = `${Math.round(Math.random() * 70)}%`
+          const pika2 = $(`<img class="pika2" src ="./images/2-black.png" style="top:${top}; left:${left}">`)
+          $("#game").append(pika2)
+          mo(pika2)
+        }
+        if (random > 5 && $("#game").length < 5) {
+          const top = `${Math.round(Math.random() * 70)}%`
+          const left = `${Math.round(Math.random() * 70)}%`
+          const pika3 = $(`<img class="pika3" src ="./images/3-black.png" style="top:${top}; left:${left}">`)
+          $("#game").append(pika3)
+          ve(pika3)
+        }
+
+
+        if (cd <= 0) {
+          clearInterval(timer)
+          $('#game img').remove()
+          $('#btn-start').attr('disabled', false)
+          console.log("high.score", high)
+
+          if (score >= 0) {
+            Swal.fire({
+              title: '時間到',
+              text: `你得到${score}分`,
+              width: 600,
+              padding: '3em',
+              background: '#fff url(./images/main.png)no-repeat',
+              backdrop: `
+            rgba(0,0,123,0.4)
+            url(./images/unnamed.gif)
+            left top
+            no-repeat
+          `,
+            customClass:{
+              confirmButton: 'btn',
+            }
+            }
+            )
+          } else {
+            Swal.fire({
+              title: `你得到${score}分`,
+              text: '加油好嗎?',
+              width: 600,
+              padding: '3em',
+              background: '#fff url(./images/main.png)no-repeat',
+              backdrop: `
+            rgba(0,0,123,0.4)
+            url(./images/brain-you-dumb.gif)
+            left top
+            no-repeat
+          `,
+            customClass:{
+              confirmButton: 'btn',
+            }
+            }
+            )
+          }
+
+          $('.before').css("display","flex")
+
+          audio.pause()
+          audio.currentTime = 0
+
+          if (score > high.score) {
+            localStorage.setItem('pokemon', '請輸入名字')
+            const input = prompt('最高分，請輸入名字')
+            high.score = score
+            high.name = input || '???'
+            $('#highname').text(high.name)
+            $('#highscore').text(high.score)
+            localStorage.setItem('pokemon', JSON.stringify(high))
+          }
+        }
+      }, 1000)
+    })
+
+
+    $('#game').on('click', 'img', function () {
+      if ($(this).hasClass('pika')) {
+        $(this).attr('src', './images/1.png')
+        score++
+      } else if ($(this).hasClass('pika2')) {
+        $(this).attr('src', './images/2.png')
+        score++
+      } else if ($(this).hasClass('pika3')) {
+        $(this).attr('src', './images/3.png')
+        au.src = './鴨子呱音效.mp3'
+        au.play()
+        score -= 2
+      }
+      $(this).stop()
+      $(this).css({
+        'user-select': 'none',
+        '-webkit-user-drag': 'none',
+        'pointer-events': 'none'
+      })
+      $(this).removeClass('pika')
+      $(this).removeClass('pika2')
+      $(this).removeClass('pika3')
+      $('#score').text(score)
+    })
+
+  </script>
+</body>
+
+</html>
